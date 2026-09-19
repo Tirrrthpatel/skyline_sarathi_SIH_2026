@@ -1,0 +1,16 @@
+{
+  "name": "skyline-sarathi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skyline सारथी — AI Airplane Fare Price Prediction Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "preview:frontend": "npm --prefix frontend run preview",
+    "backend": "python backend/run.py",
+    "test:backend": "python backend/test_backend.py"
+  }
+}

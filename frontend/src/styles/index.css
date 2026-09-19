@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Aviation Window Palette */
+  --aviation-blue: #074E8D;
+  --aviation-sky: #2D74B4;
+  --aviation-accent: #5691C8;
+  --aviation-light: #88B3DC;
+  --aviation-surface: #E2E0E3;
+  --aircraft-silver: #C2C9D7;
+  --aircraft-shadow: #A8ADBB;
+  --cabin-accent: #48382F;
+  --cabin-muted: #736358;
+}
+
+html {
+  background-color: #E2E0E3;
+  color: #074E8D;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #E2E0E3;
+  color: #074E8D;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lenis smooth scrolling compatibility */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Precision Cockpit Monospace styling */
+.font-mono-avionics {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.015em;
+}
+
+/* Premium aviation scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #E2E0E3;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D74B4;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #074E8D;
+}
+
+/* Custom UI utilities */
+.glass-cloud {
+  background: rgba(247, 246, 249, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(194, 201, 215, 0.6);
+}
+
+.glass-blue {
+  background: rgba(7, 78, 141, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(86, 145, 200, 0.35);
+}
+
+.aviation-btn-primary {
+  background: linear-gradient(135deg, #074E8D 0%, #2D74B4 100%);
+  color: #F7F6F9;
+  font-weight: 600;
+  border: 1px solid rgba(86, 145, 200, 0.4);
+  box-shadow: 0 4px 16px -2px rgba(7, 78, 141, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.aviation-btn-primary:hover {
+  background: linear-gradient(135deg, #2D74B4 0%, #5691C8 100%);
+  box-shadow: 0 6px 20px -2px rgba(7, 78, 141, 0.35);
+  transform: translateY(-1px);
+}
+
+.aviation-btn-secondary {
+  background: #E2E0E3;
+  color: #074E8D;
+  font-weight: 600;
+  border: 1px solid #C2C9D7;
+  transition: all 0.2s ease;
+}
+.aviation-btn-secondary:hover {
+  background: #88B3DC;
+  border-color: #5691C8;
+  color: #074E8D;
+}
