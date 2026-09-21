@@ -12,5 +12,25 @@
     "preview:frontend": "npm --prefix frontend run preview",
     "backend": "python backend/run.py",
     "test:backend": "python backend/test_backend.py"
-  }
+  },
+  "dependencies": {
+    "package.json": "^2.0.1"
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mrinal-San/skyline_sarathi_SIH_2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mrinal-San/skyline_sarathi_SIH_2026/issues"
+  },
+  "homepage": "https://github.com/Mrinal-San/skyline_sarathi_SIH_2026#readme"
 }
