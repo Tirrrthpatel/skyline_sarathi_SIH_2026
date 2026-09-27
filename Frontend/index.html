@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skyline सारथी | Real-time Airfare Price Index for India (SIH26056)</title>
+    <meta name="description" content="Skyline सारथी - Real-time Airfare Price Index for India through Automated Web Scraping of Airline and OTA Portals for CPI Augmentation (SIH26056)." />
+
+    <!-- Google Fonts: Inter (400-900) for Swiss International Typographic Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome 6.5.2 (Enterprise & Brand Icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="assets/logo.webp" />
+
+    <!-- Leaflet 1.9.4 Map Engine for Aviation & Satellite Layers -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Google Identity Services SDK for Real Google OAuth 2.0 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Early theme init script -->
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('theme');
+          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-white dark:bg-black text-black dark:text-white antialiased selection:bg-[#f3d400] selection:text-black swiss-noise overflow-x-hidden transition-colors duration-150">
+    <!-- React App Root Container -->
+    <div id="root" class="relative z-10 min-h-screen bg-white dark:bg-black text-black dark:text-white"></div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

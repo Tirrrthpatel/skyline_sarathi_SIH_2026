@@ -1,0 +1,344 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+@import "tw-animate-css";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* Fallback local @font-face */
+@font-face {
+  font-family: "Geist Pixel Circle";
+  src: url("/fonts/GeistPixel-Circle.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@theme {
+  --color-swiss-bg: #FFFFFF;
+  --color-swiss-fg: #000000;
+  --color-swiss-muted: #F2F2F2;
+  --color-swiss-accent: #000000;
+  --color-swiss-secondary: #f3d400;
+  --color-secondary: #f3d400;
+  --color-swiss-border: #000000;
+
+  --color-aircraft-white: #FFFFFF;
+  --color-secondary-light: #F2F2F2;
+  --color-engine-surface: #E5E5E5;
+  --color-metallic-gray: #000000;
+  --color-carbon-primary: #000000;
+  --color-carbon-secondary: #1A1A1A;
+  --color-carbon-deep: #000000;
+  --color-studio-gray: #666666;
+
+  --color-telemetry-emerald: #000000;
+  --color-telemetry-amber: #f3d400;
+  --color-telemetry-sky: #000000;
+  --color-telemetry-crimson: #000000;
+
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'Roboto Mono', monospace;
+  --font-retro: 'JetBrains Mono Variable', monospace;
+
+  --radius-card: 0px;
+}
+
+:root {
+  --bg: #FFFFFF;
+  --text: #000000;
+  --muted: #666666;
+  --nav-text: #000000;
+  --swiss-red: #000000;
+  --swiss-secondary: #f3d400;
+  --secondary: #f3d400;
+  --secondary-fg: #000000;
+  --swiss-gray: #F2F2F2;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', monospace;
+}
+
+html.dark, [data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --text: #FFFFFF;
+  --muted: #A3A3A3;
+  --nav-text: #FFFFFF;
+  --swiss-red: #000000;
+  --swiss-secondary: #f3d400;
+  --secondary: #f3d400;
+  --secondary-fg: #000000;
+  --swiss-gray: #161616;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Global Custom Airplane Cursor in Pure Black (#000000) with White Outline (No Orange) */
+html, body, *, *::before, *::after {
+  cursor: url("/airplane-cursor.svg") 1 1, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='translate(-4.5, -4.5) rotate(-45 16 16)'%3E%3Cpath d='M16 2 L18 8 L29 17 L29 20 L18 17 L18 26 L22 29 L22 31 L16 29 L10 31 L10 29 L14 26 L14 17 L3 20 L3 17 L14 8 Z' fill='%23000000' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 1 1, auto !important;
+}
+
+button, a, select, input[type="submit"], input[type="button"], [role="button"] {
+  cursor: url("/airplane-cursor.svg") 1 1, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='translate(-4.5, -4.5) rotate(-45 16 16)'%3E%3Cpath d='M16 2 L18 8 L29 17 L29 20 L18 17 L18 26 L22 29 L22 31 L16 29 L10 31 L10 29 L14 26 L14 17 L3 20 L3 17 L14 8 Z' fill='%23000000' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 1 1, pointer !important;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #FFFFFF;
+  color: #000000;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.15s ease-linear, color 0.15s ease-linear;
+}
+
+html.dark, html.dark body {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Swiss International Style CSS Patterns & Textures */
+.swiss-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html.dark .swiss-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+}
+
+.swiss-dots {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.09) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+html.dark .swiss-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1.5px, transparent 1.5px);
+}
+
+.swiss-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+html.dark .swiss-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.06) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.swiss-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+}
+
+/* Typography Utility Classes */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.font-retro {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-avionics, .font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Swiss Architectural Components - Zero hover shifts, completely stable */
+.swiss-card {
+  background-color: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  color: #000000;
+}
+
+html.dark .swiss-card {
+  background-color: #0A0A0A !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.swiss-card-muted {
+  background-color: #F2F2F2;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  color: #000000;
+}
+
+html.dark .swiss-card-muted {
+  background-color: #171717 !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.swiss-card-black {
+  background-color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  color: #FFFFFF;
+}
+
+html.dark .swiss-card-black {
+  background-color: #000000 !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.swiss-btn-primary {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background-color 0.15s ease-linear, color 0.15s ease-linear, border-color 0.15s ease-linear;
+}
+
+html.dark .swiss-btn-primary {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #FFFFFF !important;
+}
+
+.swiss-btn-primary:hover {
+  background-color: #262626 !important;
+  border-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .swiss-btn-primary:hover {
+  background-color: #E5E5E5 !important;
+  border-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.swiss-btn-secondary {
+  background-color: #f3d400;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background-color 0.15s ease-linear, color 0.15s ease-linear, border-color 0.15s ease-linear;
+}
+
+html.dark .swiss-btn-secondary {
+  background-color: #f3d400 !important;
+  color: #000000 !important;
+  border-color: #f3d400 !important;
+}
+
+.swiss-btn-secondary:hover {
+  background-color: #000000 !important;
+  color: #f3d400 !important;
+  border-color: #000000 !important;
+}
+
+html.dark .swiss-btn-secondary:hover {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #FFFFFF !important;
+}
+
+.swiss-badge-secondary {
+  background-color: #f3d400;
+  color: #000000;
+  border: 1px solid #000000;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.swiss-btn-accent {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background-color 0.15s ease-linear, color 0.15s ease-linear, border-color 0.15s ease-linear;
+}
+
+html.dark .swiss-btn-accent {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #FFFFFF !important;
+}
+
+.swiss-btn-accent:hover {
+  background-color: #262626 !important;
+  border-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .swiss-btn-accent:hover {
+  background-color: #E5E5E5 !important;
+  border-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* Compatibility aliases */
+.satin-card, .satin-card-elevated, .satin-card-dark {
+  background-color: #FFFFFF;
+  border: 2px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  color: #000000 !important;
+}
+
+html.dark .satin-card, html.dark .satin-card-elevated, html.dark .satin-card-dark {
+  background-color: #0A0A0A !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 0px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #FFFFFF;
+}
