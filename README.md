@@ -105,40 +105,6 @@ d:\UNI\Skyline_Sarathi\
 
 ---
 
-## 🔒 Security & Environment Credentials Governance
-
-> [!IMPORTANT]
-> ### 🛡️ ZERO CREDENTIALS LEAKAGE POLICY
-> **All API keys, Google OAuth Client IDs, and Client Secrets are completely hidden and isolated from version control.**
-> - **Source Code Sanitization**: Zero secrets or credentials exist in `.ts`, `.tsx`, `.js`, or `.json` files.
-> - **Environment Decoupling**: All sensitive keys are loaded at runtime via `import.meta.env` from `.env`.
-> - **Automated Git Shields**: Both the root `.gitignore` and `Frontend/.gitignore` block `.env`, `.env.*`, `*.env`, and all local credential variations.
-> - **Safe for Git Push**: Running `git add .` and `git push` will **NEVER** stage, commit, or push `.env` files or API secrets to GitHub or any remote repository.
-
----
-
-### 📋 Pre-Push Git Verification Checklist
-
-To verify that your credentials and `.env` files are safely excluded before pushing to GitHub:
-
-```bash
-# 1. Check git status - .env will NOT be present in untracked or staged files
-git status
-
-# 2. Test git ignore rules on your sensitive environment files
-git check-ignore -v .env Frontend/.env backend/.env
-# Expected Output:
-# .gitignore:6:*.env          .env
-# Frontend/.gitignore:4:*.env Frontend/.env
-# .gitignore:14:backend/.env  backend/.env
-
-# 3. Dry-run staging to see every file that would be added
-git add --dry-run .
-# Notice that only .env.example files are added, NEVER .env!
-```
-
----
-
 ### ⚙️ Step-by-Step Environment & Google OAuth Setup
 
 #### Step 1: Copy Environment Templates
