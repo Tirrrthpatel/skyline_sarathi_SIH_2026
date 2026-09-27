@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix Frontend run dev",
-    "build": "npm --prefix Frontend run build",
+    "build": "npm --prefix Frontend install && npm --prefix Frontend run build",
     "preview": "npm --prefix Frontend run preview"
   }
 }

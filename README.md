@@ -182,6 +182,29 @@ npm run build
 
 ---
 
+### 🌐 Deploying to Vercel (1-Click Ready)
+
+The repository includes pre-configured `vercel.json` manifests supporting both root and sub-folder deployment:
+
+#### Option A: Direct Repository Import (Zero Config)
+1. Go to [Vercel Dashboard](https://vercel.com/new) and click **"Add New Project"** > **"Import Git Repository"**.
+2. Select `skyline_sarathi_SIH_2026`.
+3. Leave **Root Directory** as `./` (default).
+4. The included `vercel.json` automatically triggers `npm --prefix Frontend install && npm --prefix Frontend run build` and sets the output directory to `Frontend/dist`.
+5. *(Optional)* Add your environment variables in Vercel Project Settings > **Environment Variables**:
+   - `VITE_GOOGLE_CLIENT_ID`
+   - `VITE_GOOGLE_CLIENT_SECRET`
+6. Click **Deploy**!
+
+#### Option B: Setting Root Directory to `Frontend`
+If you choose to set **Root Directory** to `Frontend` in Vercel:
+- **Framework Preset**: Vite
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- Deployments succeed automatically as `Frontend/vercel.json` handles client-side SPA route rewrites.
+
+---
+
 ### Step 2: Run the FastAPI Telemetry Backend (Port 8000)
 
 ```bash
