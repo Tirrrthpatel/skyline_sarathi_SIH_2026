@@ -66,19 +66,12 @@
 
 | Package | Version Spec | Purpose |
 | :--- | :--- | :--- |
-| `fastapi` | `>=0.110.0` | Asynchronous REST microservice delivering sub-18ms telemetry endpoints |
+| `fastapi` | `>=0.110.0` | REST API for airport metadata and Neon-backed fare search |
 | `uvicorn[standard]` | `>=0.28.0` | Production ASGI web server running FastAPI with event loop optimizations |
 | `pydantic` | `>=2.6.0` | Strict data validation and schema serialization for flight search models |
 | `python-multipart` | `>=0.0.9` | Form data and multipart payload parser |
-
-### B. Flask Corridor Service (`backend/flask/requirements.txt`)
-*Port: 5000 | Endpoint: `http://localhost:5000/api/airports`*
-
-| Package | Version Spec | Purpose |
-| :--- | :--- | :--- |
-| `flask` | `>=3.0.0` | Lightweight WSGI web framework for airport metadata and route fallback |
-| `flask-cors` | `>=4.0.0` | Cross-Origin Resource Sharing (CORS) handler for web browser access |
-| `requests` | `>=2.31.0` | HTTP request client for upstream gateway polling |
+| `psycopg2-binary` | `>=2.9.9` | PostgreSQL driver for querying Neon |
+| `python-dotenv` | `>=1.0.0` | Loads local Neon connection settings |
 
 ---
 
@@ -164,16 +157,4 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 API Docs: `http://localhost:8000/docs`
 
-### Quick Start (Flask Corridor Backend):
-```bash
-cd backend/flask
-python -m venv venv
-# On Windows:
-.\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-pip install -r requirements.txt
-python app.py
-```
-Endpoint: `http://localhost:5000/api/airports`
+Airport metadata is served by FastAPI at `GET http://localhost:8000/api/airports`.

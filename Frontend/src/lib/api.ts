@@ -1,12 +1,11 @@
 import type { FlightSearchParams, TelemetryPredictionResult, Airport, UserSession } from "@/types/aviation"
-import { computeFlightTelemetry, INDIAN_AIRPORTS } from "./aviationData"
+import { INDIAN_AIRPORTS } from "./aviationData"
 
-const FASTAPI_BASE = "http://localhost:8000/api"
-const FLASK_BASE = "http://localhost:5000/api"
+const API_BASE = import.meta.env.VITE_FASTAPI_BASE || "http://localhost:8000/api"
 
 export async function fetchAirports(): Promise<Airport[]> {
   try {
-    const res = await fetch(`${FLASK_BASE}/airports`, { signal: AbortSignal.timeout(1800) })
+    const res = await fetch(`${API_BASE}/airports`, { signal: AbortSignal.timeout(1800) })
     if (res.ok) {
       const data = await res.json()
       if (Array.isArray(data) && data.length > 0) {
@@ -20,21 +19,19 @@ export async function fetchAirports(): Promise<Airport[]> {
 }
 
 export async function predictFlightFare(params: FlightSearchParams): Promise<TelemetryPredictionResult> {
-  try {
-    const res = await fetch(`${FASTAPI_BASE}/predict-fare`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(params),
-      signal: AbortSignal.timeout(2500)
-    })
-    if (res.ok) {
-      const data = await res.json()
-      return data
-    }
-  } catch {
-    // If backend is booting or not running, use client-side calibrated ML telemetry
+  const res = await fetch(`${API_BASE}/predict-fare`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+    signal: AbortSignal.timeout(15000)
+  })
+
+  if (!res.ok) {
+    const data: { detail?: string } = await res.json()
+    throw new Error(data.detail || `Fare query failed (HTTP ${res.status}).`)
   }
-  return computeFlightTelemetry(params)
+
+  return res.json() as Promise<TelemetryPredictionResult>
 }
 
 export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID || ""
@@ -97,25 +94,6 @@ export async function authenticateGoogle(credentialOrToken: string): Promise<Use
     } catch (err) {
       console.warn("Failed to fetch userinfo from Google:", err)
     }
-  }
-
-  // 4. Try forwarding to backend if available
-  try {
-    const res = await fetch(`${FASTAPI_BASE}/auth/google`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: credentialOrToken, clientId: GOOGLE_CLIENT_ID }),
-      signal: AbortSignal.timeout(1500)
-    })
-    if (res.ok) {
-      const data = await res.json()
-      if (data && data.name) {
-        localStorage.setItem("aero_user", JSON.stringify(data))
-        return data
-      }
-    }
-  } catch {
-    // Backend offline; client-side Google verification succeeded
   }
 
   const session: UserSession = {

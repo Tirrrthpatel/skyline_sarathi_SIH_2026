@@ -6,9 +6,12 @@ interface TelemetryKpiCardsProps {
 }
 
 export function TelemetryKpiCards({ details }: TelemetryKpiCardsProps) {
-  const diffFromAvg = Math.round(
-    ((details.predictedFare - details.historicalAvg) / details.historicalAvg) * 100
-  )
+  const isModelEstimate = details.predictionSource === "linear_regression"
+  const diffFromAvg = details.historicalAvg
+    ? Math.round(
+      ((details.predictedFare - details.historicalAvg) / details.historicalAvg) * 100
+    )
+    : 0
   const isCheaper = diffFromAvg <= 0
 
   return (
@@ -22,12 +25,12 @@ export function TelemetryKpiCards({ details }: TelemetryKpiCardsProps) {
               [CHANNEL 01]
             </span>
             <span className="font-mono text-[10px] font-bold uppercase bg-[#f3d400] text-black border border-black px-1.5 py-0.5">
-              FAIR VALUE
+              {isModelEstimate ? "MODEL ESTIMATE" : "FAIR VALUE"}
             </span>
           </div>
 
           <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white font-mono block">
-            PREDICTED TARIFF
+            {isModelEstimate ? "ESTIMATED TARIFF" : "PREDICTED TARIFF"}
           </span>
 
           <div className="font-sans font-black text-3xl sm:text-4xl text-black dark:text-white tracking-tight mt-1">
@@ -36,26 +39,39 @@ export function TelemetryKpiCards({ details }: TelemetryKpiCardsProps) {
         </div>
 
         <div className="mt-4 pt-3 border-t-2 border-black dark:border-white flex items-center justify-between text-xs font-mono">
-          <div>
-            {isCheaper ? (
-              <span className="flex items-center text-black dark:text-white font-bold">
-                <TrendingDown className="w-3.5 h-3.5 mr-1 text-black dark:text-white" />
-                {Math.abs(diffFromAvg)}% BELOW AVG
+          {isModelEstimate ? (
+            <span className="text-neutral-600 dark:text-neutral-300 text-[10px]">
+              TEST MAE: ₹{(details.modelTestMae ?? 0).toLocaleString("en-IN")}
+            </span>
+          ) : (
+            <>
+              <div>
+                {isCheaper ? (
+                  <span className="flex items-center text-black dark:text-white font-bold">
+                    <TrendingDown className="w-3.5 h-3.5 mr-1 text-black dark:text-white" />
+                    {Math.abs(diffFromAvg)}% BELOW AVG
+                  </span>
+                ) : (
+                  <span className="flex items-center text-black dark:text-white font-bold">
+                    <TrendingUp className="w-3.5 h-3.5 mr-1" />
+                    +{diffFromAvg}% SURGE
+                  </span>
+                )}
+              </div>
+              <span className="text-neutral-500 dark:text-neutral-400 text-[11px]">
+                HIST: ₹{details.historicalAvg.toLocaleString("en-IN")}
               </span>
-            ) : (
-              <span className="flex items-center text-black dark:text-white font-bold">
-                <TrendingUp className="w-3.5 h-3.5 mr-1" />
-                +{diffFromAvg}% SURGE
-              </span>
-            )}
-          </div>
-          <span className="text-neutral-500 dark:text-neutral-400 text-[11px]">
-            HIST: ₹{details.historicalAvg.toLocaleString("en-IN")}
-          </span>
+            </>
+          )}
         </div>
+        {isModelEstimate && (
+          <p className="mt-2 text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+            Experimental estimate · {details.modelTrainingSamples ?? 0} route observations
+          </p>
+        )}
       </div>
 
-      {/* KPI Card 2: Model Confidence */}
+      {/* KPI Card 2: Lowest observed booking window */}
       <div className="p-6 bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between pb-2 border-b-2 border-black dark:border-white mb-3">
@@ -63,27 +79,36 @@ export function TelemetryKpiCards({ details }: TelemetryKpiCardsProps) {
               [CHANNEL 02]
             </span>
             <span className="font-mono text-[10px] font-bold uppercase bg-[#f3d400] text-black border border-black px-1.5 py-0.5">
-              CONFORMAL
+              OBSERVED DATA
             </span>
           </div>
 
           <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white font-mono block">
-            MODEL CONFIDENCE
+            LOWEST AVG FARE WINDOW
           </span>
 
           <div className="font-sans font-black text-3xl sm:text-4xl text-black dark:text-white tracking-tight mt-1">
-            {details.confidence}%
+            {details.bestBookingWindowDays == null
+              ? "N/A"
+              : details.bestBookingWindowDays === 0
+                ? "TODAY"
+                : `T-${details.bestBookingWindowDays}D`}
           </div>
         </div>
 
         <div className="mt-4 pt-3 border-t-2 border-black dark:border-white flex items-center justify-between text-xs font-mono">
           <span className="text-neutral-500 dark:text-neutral-400">
-            INTERVAL COVERAGE
+            CONSIDER BUYING BY
           </span>
           <span className="font-bold text-black dark:text-white">
-            &plusmn;2.8% S.E.
+            {details.recommendedPurchaseDate ?? "Not available"}
           </span>
         </div>
+        <p className="mt-2 text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+          {details.bestWindowAverageFare == null
+            ? "Not enough fare history to estimate a window."
+            : `Avg ₹${details.bestWindowAverageFare.toLocaleString("en-IN")} · ${details.bookingWindowSampleSize ?? 0} observations`}
+        </p>
       </div>
 
       {/* KPI Card 3: Booking Horizon */}

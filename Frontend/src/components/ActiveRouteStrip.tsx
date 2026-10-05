@@ -9,8 +9,9 @@ interface ActiveRouteStripProps {
 export function ActiveRouteStrip({ telemetry, onChangeFlight }: ActiveRouteStripProps) {
   const { params, originAirport, destinationAirport, details, bearing } = telemetry
 
-  const formattedHours = Math.floor(details.flightDurationMinutes / 60)
-  const formattedMins = details.flightDurationMinutes % 60
+  const formattedDuration = details.flightDurationMinutes === null
+    ? "N/A"
+    : `${Math.floor(details.flightDurationMinutes / 60)}h ${details.flightDurationMinutes % 60}m`
 
   return (
     <div className="w-full rounded-none p-5 sm:p-6 bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white transition-colors duration-150">
@@ -76,7 +77,7 @@ export function ActiveRouteStrip({ telemetry, onChangeFlight }: ActiveRouteStrip
               FLIGHT TIME
             </span>
             <p className="font-bold text-black dark:text-white mt-0.5 text-xs">
-              {formattedHours}H {formattedMins}M
+              {formattedDuration}
             </p>
           </div>
 
@@ -95,7 +96,11 @@ export function ActiveRouteStrip({ telemetry, onChangeFlight }: ActiveRouteStrip
         <div className="flex items-center gap-3 justify-end">
           <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-neutral-100 dark:bg-neutral-900 border-2 border-black dark:border-white font-mono text-[11px]">
             <span className="w-2 h-2 bg-[#f3d400] border border-black inline-block"></span>
-            <span className="text-black dark:text-white font-bold uppercase">FEED SYNCED</span>
+            <span className="text-black dark:text-white font-bold uppercase">
+              {details.predictionSource === "linear_regression"
+                ? `LINEAR REGRESSION · ${details.modelTrainingSamples ?? 0} SAMPLES`
+                : `POSTGRESQL · ${details.sampleSize ?? 0} RECORDS`}
+            </span>
           </div>
 
           <button

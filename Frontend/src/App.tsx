@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import type { FlightSearchParams, TelemetryPredictionResult, UserSession, Airport } from "@/types/aviation"
-import { computeFlightTelemetry, INDIAN_AIRPORTS } from "@/lib/aviationData"
+import { INDIAN_AIRPORTS } from "@/lib/aviationData"
 import { predictFlightFare, fetchAirports, getStoredUser } from "@/lib/api"
 import { Navbar } from "@/components/Navbar"
 import { AuthModal } from "@/components/AuthModal"
@@ -53,11 +53,10 @@ export function App() {
   })
 
   // Telemetry Prediction Result
-  const [telemetry, setTelemetry] = useState<TelemetryPredictionResult>(() => {
-    return computeFlightTelemetry(searchParams)
-  })
+  const [telemetry, setTelemetry] = useState<TelemetryPredictionResult | null>(null)
 
   const [isLoadingTelemetry, setIsLoadingTelemetry] = useState(false)
+  const [fareQueryError, setFareQueryError] = useState<string | null>(null)
 
   // Handle URL history pushState/popstate for static routing
   const navigateTo = (newView: "landing" | "search" | "dashboard") => {
@@ -94,11 +93,16 @@ export function App() {
   // Execute Flight Search & Telemetry Update
   const handleSearch = async (params: FlightSearchParams) => {
     setSearchParams(params)
+    setFareQueryError(null)
     setIsLoadingTelemetry(true)
     try {
       const result = await predictFlightFare(params)
       setTelemetry(result)
       navigateTo("dashboard")
+    } catch (error) {
+      setFareQueryError(
+        error instanceof Error ? error.message : "Unable to load fares from the database."
+      )
     } finally {
       setIsLoadingTelemetry(false)
     }
@@ -194,7 +198,7 @@ export function App() {
                 Search & Calibrate Flight Telemetry
               </h1>
               <p className="mt-2 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-mono">
-                Select origin hub and destination corridor to calculate real-time ML fair fare benchmarks
+                Query matching airline fares from PostgreSQL for your route and departure date
               </p>
             </div>
 
@@ -204,6 +208,14 @@ export function App() {
               onSearch={handleSearch}
               airports={airports}
             />
+
+            {fareQueryError && (
+              <div role="alert" className="mt-4 border-2 border-red-700 bg-red-50 p-4 font-mono text-sm text-red-900 dark:bg-red-950 dark:text-red-100">
+                <p className="font-black uppercase">Could not load PostgreSQL fare data</p>
+                <p className="mt-1">{fareQueryError}</p>
+                <p className="mt-1">Check that FastAPI is running and the Neon database has matching fares.</p>
+              </div>
+            )}
 
             {/* Ingestion Notes Card - Zero Hover Shift */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -248,6 +260,7 @@ export function App() {
 
         {/* ======================= VIEW: DASHBOARD ======================= */}
         {view === "dashboard" && (
+          telemetry ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 animate-in fade-in duration-200">
             
             {/* 1. Active Route Strip */}
@@ -295,9 +308,28 @@ export function App() {
             <AirlineFareComparison
               airlines={telemetry.airlines}
               durationMinutes={telemetry.details.flightDurationMinutes}
+              departureDate={telemetry.params.departure_date}
+              originCode={telemetry.params.origin}
+              destinationCode={telemetry.params.destination}
+              predictionDetails={telemetry.details}
             />
 
           </div>
+          ) : (
+            <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+              <h1 className="font-black text-2xl uppercase">No database results loaded</h1>
+              <p className="mt-3 font-mono text-sm text-neutral-600 dark:text-neutral-400">
+                Search a route to query matching fare records from PostgreSQL.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigateTo("search")}
+                className="mt-6 border-2 border-black bg-black px-6 py-3 font-mono text-xs font-black uppercase text-white dark:border-white dark:bg-white dark:text-black"
+              >
+                Search database fares
+              </button>
+            </div>
+          )
         )}
 
       </main>

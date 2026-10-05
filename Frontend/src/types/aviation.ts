@@ -20,14 +20,24 @@ export interface FlightSearchParams {
 
 export interface FareCalculationDetails {
   predictedFare: number;
-  confidence: number;          // %
+  confidence: number | null;   // unavailable when no calibrated model is configured
   variance: number;            // %
   bookingWindowDays: number;
   historicalAvg: number;
-  corridorStatus: 'Below Avg Fare' | 'Optimal Window' | 'Surge Alert';
+  corridorStatus?: 'Below Avg Fare' | 'Optimal Window' | 'Surge Alert';
   distanceKm: number;
-  flightDurationMinutes: number;
+  flightDurationMinutes: number | null;
   volatilityScore?: number;
+  sampleSize?: number;
+  currency?: string;
+  predictionSource?: "database" | "linear_regression";
+  modelTrainingSamples?: number | null;
+  modelTestMae?: number | null;
+  modelTestR2?: number | null;
+  bestBookingWindowDays?: number | null;
+  recommendedPurchaseDate?: string | null;
+  bookingWindowSampleSize?: number;
+  bestWindowAverageFare?: number | null;
 }
 
 export interface Airline {
@@ -41,6 +51,16 @@ export interface Airline {
   departureTime: string;
   arrivalTime: string;
   stops: string;
+  departureAirport?: string;
+  departureAirportCode?: string;
+  arrivalAirport?: string;
+  arrivalAirportCode?: string;
+  departureDate?: string;
+  flightDuration?: string | null;
+  currentPrice?: number;
+  currency?: string;
+  website?: string;
+  scrapeTimestamp?: string | null;
 }
 
 export interface FunnelStage {
@@ -65,7 +85,7 @@ export interface TelemetryPredictionResult {
   params: FlightSearchParams;
   originAirport: Airport;
   destinationAirport: Airport;
-  destAirport: Airport;
+  destAirport?: Airport;
   details: FareCalculationDetails;
   airlines: (Airline & { calculatedFare: number })[];
   funnelStages: FunnelStage[];

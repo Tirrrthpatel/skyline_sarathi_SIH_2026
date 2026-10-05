@@ -11,6 +11,17 @@ export function FlightPriceAnalysis({ stages, predictedFare }: FlightPriceAnalys
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  if (stages.length === 0) {
+    return (
+      <div className="p-6 sm:p-8 rounded-none bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white">
+        <h3 className="font-black text-xl uppercase">Fare breakdown unavailable</h3>
+        <p className="mt-2 text-sm font-mono text-neutral-500 dark:text-neutral-400">
+          No fare breakdown data is available.
+        </p>
+      </div>
+    )
+  }
+
   const maxAmount = Math.max(...stages.map((s) => s.amount), predictedFare * 1.4)
 
   const getClampedTooltipPct = (index: number) => {

@@ -10,6 +10,17 @@ export function FareForecastCurve({ data }: FareForecastCurveProps) {
   const [hoverX, setHoverX] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  if (data.length === 0) {
+    return (
+      <div className="p-6 sm:p-8 rounded-none bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white">
+        <h3 className="font-black text-xl uppercase">Fare history unavailable</h3>
+        <p className="mt-2 text-sm font-mono text-neutral-500 dark:text-neutral-400">
+          No historical fare series is available for this route.
+        </p>
+      </div>
+    )
+  }
+
   // Chart dimensions in SVG coordinates
   const width = 800
   const height = 280

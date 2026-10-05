@@ -1,7 +1,14 @@
 import { useState, useId } from "react"
 import type { Airport, FlightSearchParams } from "@/types/aviation"
 import { INDIAN_AIRPORTS } from "@/lib/aviationData"
-import { ArrowLeftRight, Calendar, Users, AlertCircle, PlaneTakeoff, PlaneLanding, ChevronDown, Sparkles } from "lucide-react"
+import { ArrowLeftRight, Calendar, AlertCircle, PlaneTakeoff, PlaneLanding, ChevronDown, Sparkles } from "lucide-react"
+
+function toLocalDateString(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
 
 interface FlightSearchWidgetProps {
   initialParams: FlightSearchParams
@@ -20,24 +27,24 @@ export function FlightSearchWidget({
   const destSelectId = useId()
   const departureDateId = useId()
   const returnDateId = useId()
+  const todayStr = toLocalDateString(new Date())
 
   const [origin, setOrigin] = useState(initialParams.origin || "DEL")
   const [destination, setDestination] = useState(initialParams.destination || "BLR")
   const [departureDate, setDepartureDate] = useState(
-    initialParams.departure_date || new Date().toISOString().split("T")[0]
+    initialParams.departure_date && initialParams.departure_date >= todayStr
+      ? initialParams.departure_date
+      : todayStr
   )
   const [returnDate, setReturnDate] = useState(initialParams.return_date || "")
   const [tripType, setTripType] = useState<"one_way" | "round_trip">(
     initialParams.trip_type || "one_way"
   )
-  const [travellers, setTravellers] = useState(initialParams.travellers || 1)
-  const [cabinClass, setCabinClass] = useState<'Economy' | 'Premium Economy' | 'Business'>(
-    initialParams.cabin_class || "Economy"
+  const [cabinClass, setCabinClass] = useState<"Economy" | "Business">(
+    initialParams.cabin_class === "Business" ? "Business" : "Economy"
   )
 
   const [validationError, setValidationError] = useState<string | null>(null)
-
-  const todayStr = new Date().toISOString().split("T")[0]
 
   const handleSwapAirports = () => {
     const temp = origin
@@ -48,6 +55,11 @@ export function FlightSearchWidget({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (departureDate < todayStr) {
+      setValidationError("Departure date cannot be in the past.")
+      return
+    }
 
     if (origin === destination) {
       setValidationError("Origin airport and destination corridor cannot be identical.")
@@ -67,7 +79,7 @@ export function FlightSearchWidget({
       departure_date: departureDate,
       return_date: tripType === "round_trip" ? returnDate : undefined,
       trip_type: tripType,
-      travellers,
+      travellers: 1,
       cabin_class: cabinClass
     })
   }
@@ -106,7 +118,7 @@ export function FlightSearchWidget({
               if (!returnDate) {
                 const nextWeek = new Date()
                 nextWeek.setDate(nextWeek.getDate() + 7)
-                setReturnDate(nextWeek.toISOString().split("T")[0])
+                setReturnDate(toLocalDateString(nextWeek))
               }
             }}
             className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
@@ -121,7 +133,7 @@ export function FlightSearchWidget({
 
         {/* Cabin Class Buttons */}
         <div className="inline-flex border-2 border-black dark:border-white divide-x-2 divide-black dark:divide-white text-xs font-bold uppercase">
-          {(["Economy", "Premium Economy", "Business"] as const).map((cls) => (
+          {(["Economy", "Business"] as const).map((cls) => (
             <button
               key={cls}
               type="button"
@@ -221,11 +233,11 @@ export function FlightSearchWidget({
 
         </div>
 
-        {/* Date, Passengers & Search Action */}
+        {/* Travel Dates & Search Action */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 items-end pt-2 text-left">
           
           {/* Departure Date */}
-          <div className={`${tripType === "round_trip" ? "md:col-span-3" : "md:col-span-4"}`}>
+          <div className={`${tripType === "round_trip" ? "md:col-span-3" : "md:col-span-6"}`}>
             <label htmlFor={departureDateId} className="block text-xs font-bold uppercase tracking-wider text-black dark:text-white mb-2 font-mono flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-black dark:text-white" />
               Departure Date
@@ -235,7 +247,12 @@ export function FlightSearchWidget({
               type="date"
               min={todayStr}
               value={departureDate}
-              onChange={(e) => setDepartureDate(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value >= todayStr) {
+                  setDepartureDate(e.target.value)
+                  setValidationError(null)
+                }
+              }}
               className="w-full bg-white dark:bg-black border-2 border-black dark:border-white rounded-none px-3.5 py-3 text-sm font-bold text-black dark:text-white font-mono focus:outline-none focus:border-black dark:focus:border-white"
             />
           </div>
@@ -258,39 +275,8 @@ export function FlightSearchWidget({
             </div>
           )}
 
-          {/* Travellers Counter */}
-          <div className={`${tripType === "round_trip" ? "md:col-span-3" : "md:col-span-4"}`}>
-            <label className="block text-xs font-bold uppercase tracking-wider text-black dark:text-white mb-2 font-mono flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-black dark:text-white" />
-              Passengers
-            </label>
-            <div className="flex items-center justify-between bg-white dark:bg-black border-2 border-black dark:border-white rounded-none px-4 py-2.5">
-              <span className="text-sm font-bold text-black dark:text-white font-mono">
-                {travellers} {travellers === 1 ? "Adult" : "Adults"}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setTravellers(Math.max(1, travellers - 1))}
-                  className="w-8 h-8 border border-black dark:border-white bg-white dark:bg-black hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white font-bold text-sm flex items-center justify-center transition-colors cursor-pointer rounded-none"
-                  disabled={travellers <= 1}
-                >
-                  -
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTravellers(Math.min(9, travellers + 1))}
-                  className="w-8 h-8 border border-black dark:border-white bg-white dark:bg-black hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white font-bold text-sm flex items-center justify-center transition-colors cursor-pointer rounded-none"
-                  disabled={travellers >= 9}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Submit Telemetry Action Button */}
-          <div className={`${tripType === "round_trip" ? "md:col-span-3" : "md:col-span-4"}`}>
+          <div className="md:col-span-6">
             <button
               type="submit"
               className="w-full bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black hover:text-white dark:hover:text-black text-xs sm:text-sm font-black uppercase tracking-wider h-[50px] border-2 border-black dark:border-white rounded-none flex items-center justify-center gap-2 cursor-pointer transition-colors duration-150"

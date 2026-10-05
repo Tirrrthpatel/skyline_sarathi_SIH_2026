@@ -16,7 +16,7 @@
 
 Civil aviation pricing in India is highly volatile, dynamic, and fragmented across independent airline websites (IndiGo, Air India, SpiceJet, Akasa) and Online Travel Agencies (MakeMyTrip, EaseMyTrip, Yatra, Cleartrip). Traditional statistical surveys conducted for national economic indicators lack the frequency to capture real-time tariff fluctuations.
 
-**Skyline सारथी** replaces static manual surveys with a scalable, robots.txt-compliant automated scraping and machine learning pipeline that computes a real-time, **DGCA-weighted Airfare Price Index**. This digital telemetry directly augments the **Consumer Price Index (CPI)** for the **Ministry of Statistics and Programme Implementation (MoSPI)** and monetary policy analysts at the **Reserve Bank of India (RBI)**.
+**Skyline सारथी** serves flight-fare telemetry from the Neon `flight_fares` database and computes a **DGCA-weighted Airfare Price Index**. Fare collection and ingestion are managed separately; this application reads the stored flight data through its FastAPI service. The telemetry augments the **Consumer Price Index (CPI)** for the **Ministry of Statistics and Programme Implementation (MoSPI)** and monetary policy analysts at the **Reserve Bank of India (RBI)**.
 
 ---
 
@@ -25,11 +25,8 @@ Civil aviation pricing in India is highly volatile, dynamic, and fragmented acro
 ```
 d:\UNI\Skyline_Sarathi\
 ├── backend/                       # Python Backend Microservices
-│   ├── fastapi/                   # FastAPI ML Telemetry Engine (Port 8000)
-│   │   ├── main.py                # Asynchronous REST endpoints (/api/predict-fare)
-│   │   └── requirements.txt
-│   ├── flask/                     # Flask Airport & Route Service (Port 5000)
-│   │   ├── app.py                 # REST endpoints (/api/airports)
+│   ├── fastapi/                   # Unified Frontend API (Port 8000)
+│   │   ├── main.py                # Airport and fare REST endpoints
 │   │   └── requirements.txt
 │   └── README.md                  # Backend setup & API documentation
 │
@@ -224,29 +221,8 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - **API Documentation**: Open `http://localhost:8000/docs`
-- **Inference Endpoint**: `POST /api/predict-fare`
-
----
-
-### Step 3: Run the Flask Airport Corridor Backend (Port 5000)
-
-```bash
-cd backend/flask
-python -m venv venv
-
-# Activate Virtual Environment:
-# Windows (PowerShell):
-.\venv\Scripts\activate
-# Linux / macOS:
-source venv/bin/activate
-
-# Install dependencies:
-pip install -r requirements.txt
-
-# Run Flask server:
-python app.py
-```
-- **Airports Endpoint**: `GET http://localhost:5000/api/airports`
+- **Neon-backed Fare Endpoint**: `POST /api/predict-fare`
+- **Airport Metadata Endpoint**: `GET /api/airports`
 
 ---
 

@@ -7,15 +7,20 @@ interface WhatIfSimulatorProps {
   initialCabinClass?: 'Economy' | 'Premium Economy' | 'Business'
 }
 
+const CABIN_CLASSES = [
+  { name: "Economy", mul: "1.0X" },
+  { name: "Business", mul: "2.8X" },
+] as const
+
 export function WhatIfSimulator({
   baseFare,
   initialDaysAhead = 14,
   initialCabinClass = "Economy"
 }: WhatIfSimulatorProps) {
   const [daysAhead, setDaysAhead] = useState(initialDaysAhead)
-  const [isWeekend, setIsWeekend] = useState(false)
-  const [isPeakSeason, setIsPeakSeason] = useState(false)
-  const [cabinClass, setCabinClass] = useState<'Economy' | 'Premium Economy' | 'Business'>(initialCabinClass)
+  const [cabinClass, setCabinClass] = useState<"Economy" | "Business">(
+    initialCabinClass === "Business" ? "Business" : "Economy"
+  )
 
   const recalculatedFare = useMemo(() => {
     let windowMultiplier = 1.0
@@ -25,25 +30,19 @@ export function WhatIfSimulator({
     else if (daysAhead >= 21 && daysAhead <= 35) windowMultiplier = 0.88
     else windowMultiplier = 0.95
 
-    const weekendMultiplier = isWeekend ? 1.15 : 1.0
-    const peakMultiplier = isPeakSeason ? 1.25 : 1.0
-
     let cabinMultiplier = 1.0
-    if (cabinClass === "Premium Economy") cabinMultiplier = 1.6
     if (cabinClass === "Business") cabinMultiplier = 2.8
 
-    const rawRatio = windowMultiplier * weekendMultiplier * peakMultiplier * cabinMultiplier
+    const rawRatio = windowMultiplier * cabinMultiplier
     return Math.round(baseFare * (rawRatio / 1.08))
-  }, [baseFare, daysAhead, isWeekend, isPeakSeason, cabinClass])
+  }, [baseFare, daysAhead, cabinClass])
 
   const diffAmount = recalculatedFare - baseFare
   const diffPct = Math.round((diffAmount / baseFare) * 100)
 
   const handleReset = () => {
     setDaysAhead(initialDaysAhead)
-    setIsWeekend(false)
-    setIsPeakSeason(false)
-    setCabinClass(initialCabinClass)
+    setCabinClass(initialCabinClass === "Business" ? "Business" : "Economy")
   }
 
   return (
@@ -63,7 +62,7 @@ export function WhatIfSimulator({
             Dynamic "What-If" Engine
           </h3>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono uppercase mt-0.5">
-            Test Elasticity Across Advance Horizon, Weekend Volatility, and Cabin Multipliers
+            Test Fare Sensitivity Across Booking Horizon and Cabin Class
           </p>
         </div>
 
@@ -107,62 +106,17 @@ export function WhatIfSimulator({
             </div>
           </div>
 
-          {/* Toggles: Weekend Travel & Peak Season */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <label className={`flex items-center justify-between p-4 border-2 transition-colors cursor-pointer select-none rounded-none ${isWeekend
-                ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white"
-                : "bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white border-black dark:border-white"
-              }`}>
-              <div>
-                <span className="text-xs font-bold block uppercase">Weekend Flight</span>
-                <span className={`text-[10px] font-mono ${isWeekend ? "text-white dark:text-black font-bold" : "text-neutral-500 dark:text-neutral-400"}`}>
-                  +15% WEEKEND PREMIUM
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={isWeekend}
-                onChange={(e) => setIsWeekend(e.target.checked)}
-                className="w-4 h-4 accent-black dark:accent-white cursor-pointer"
-              />
-            </label>
-
-            <label className={`flex items-center justify-between p-4 border-2 transition-colors cursor-pointer select-none rounded-none ${isPeakSeason
-                ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white"
-                : "bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white border-black dark:border-white"
-              }`}>
-              <div>
-                <span className="text-xs font-bold block uppercase">Peak Festive</span>
-                <span className={`text-[10px] font-mono ${isPeakSeason ? "text-white dark:text-black font-bold" : "text-neutral-500 dark:text-neutral-400"}`}>
-                  +25% FESTIVE DEMAND
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={isPeakSeason}
-                onChange={(e) => setIsPeakSeason(e.target.checked)}
-                className="w-4 h-4 accent-black dark:accent-white cursor-pointer"
-              />
-            </label>
-
-          </div>
-
           {/* Cabin Class Multipliers */}
           <div>
             <label className="text-xs font-bold text-black dark:text-white font-mono uppercase tracking-wider block mb-2">
               Cabin Class Entitlement
             </label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { name: "Economy", mul: "1.0X" },
-                { name: "Premium Economy", mul: "1.6X" },
-                { name: "Business", mul: "2.8X" }
-              ].map((c) => (
+            <div className="grid grid-cols-2 gap-3">
+              {CABIN_CLASSES.map((c) => (
                 <button
                   key={c.name}
                   type="button"
-                  onClick={() => setCabinClass(c.name as any)}
+                  onClick={() => setCabinClass(c.name)}
                   className={`py-3 px-3 border-2 text-center transition-colors cursor-pointer rounded-none ${cabinClass === c.name
                       ? "bg-[#f3d400] text-black border-2 border-black font-black"
                       : "bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white border-black dark:border-white hover:bg-neutral-200 dark:hover:bg-neutral-800"
