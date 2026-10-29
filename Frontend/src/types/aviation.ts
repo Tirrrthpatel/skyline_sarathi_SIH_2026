@@ -30,7 +30,9 @@ export interface FareCalculationDetails {
   volatilityScore?: number;
   sampleSize?: number;
   currency?: string;
-  predictionSource?: "database" | "linear_regression";
+  predictionSource?: "database" | "linear_regression" | "advance_ensemble_ml" | "database_and_ensemble_ml";
+  modelType?: string | null;
+  modelAccuracy?: number | null;
   modelTrainingSamples?: number | null;
   modelTestMae?: number | null;
   modelTestR2?: number | null;
@@ -100,4 +102,27 @@ export interface UserSession {
   avatarUrl?: string;
   isGuest: boolean;
   loginTime: string;
+  provider?: 'google' | 'neon' | 'guest';
+  neonKid?: string;
+  neonToken?: string;
+}
+
+export interface NeonKeyInfo {
+  kid?: string;
+  kty?: string;
+  crv?: string;
+  alg?: string;
+  use?: string;
+}
+
+export interface NeonAuthStatus {
+  status: 'connected' | 'unreachable' | 'not_configured' | 'error';
+  configured: boolean;
+  jwksUrl: string;
+  authBaseUrl: string;
+  keyCount: number;
+  keys: NeonKeyInfo[];
+  algorithms: string[];
+  latencyMs?: number | null;
+  error?: string;
 }

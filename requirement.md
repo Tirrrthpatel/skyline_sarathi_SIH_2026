@@ -72,6 +72,10 @@
 | `python-multipart` | `>=0.0.9` | Form data and multipart payload parser |
 | `psycopg2-binary` | `>=2.9.9` | PostgreSQL driver for querying Neon |
 | `python-dotenv` | `>=1.0.0` | Loads local Neon connection settings |
+| `pyjwt[crypto]` | `>=2.8.0` | JSON Web Token decode and cryptographic verification |
+| `cryptography` | `>=42.0.0` | Ed25519 & EdDSA asymmetric signature verification for Neon JWKS |
+| `requests` | `>=2.31.0` | HTTP client for Neon Auth JWKS keyset synchronization |
+
 
 ---
 
@@ -98,6 +102,7 @@
 
 | Service | Integration | Purpose |
 | :--- | :--- | :--- |
+| **Neon Auth (JWKS)** | `ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech` | Ed25519 asymmetric cryptographic verification & analyst auth |
 | **Leaflet Map Engine** | `unpkg.com/leaflet@1.9.4` | Open-source airspace and corridor track visualizer |
 | **CartoDB Aviation Tiles** | `basemaps.cartocdn.com` | Aviation vector base map layer (Light & Dark mode) |
 | **Esri Satellite Tiles** | `server.arcgisonline.com` | High-resolution satellite imagery map layer |
@@ -111,6 +116,14 @@
 Configure the following variables in `Frontend/.env` (and root `.env`):
 
 ```ini
+# Neon Auth JWKS Endpoint (Ed25519 Asymmetric Verification)
+NEON_JWKS_URL=https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth/.well-known/jwks.json
+NEON_AUTH_BASE_URL=https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth
+
+# Frontend Vite Mirrors
+VITE_NEON_JWKS_URL=https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth/.well-known/jwks.json
+VITE_NEON_AUTH_URL=https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth
+
 # Google OAuth 2.0 Credentials (Set your actual values in .env, never commit them)
 VITE_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
 VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret

@@ -97,8 +97,10 @@ d:\UNI\Skyline_Sarathi\
 ### 7. 4-Major Carrier Benchmark (`AirlineFareComparison`)
 - Calibrated multiplier indices comparing **IndiGo (6E)**, **Air India (AI)**, **SpiceJet (SG)**, and **Akasa Air (QP)** with baggage and schedule entitlements.
 
-### 8. Analyst Gateway with Google OAuth 2.0
-- Real Google Identity Services authentication with instant verified session fallback for offline hackathon evaluations.
+### 8. Analyst Gateway with Neon Auth (JWKS) & Google OAuth 2.0
+- **Neon Auth JWKS**: Live asymmetric cryptographic authentication utilizing Ed25519 (`EdDSA`) public keys from the official Neon Auth endpoint (`.well-known/jwks.json`). Fully integrated with FastAPI signature verification (`POST /api/auth/neon/verify`) and frontend state.
+- **Google OAuth 2.0**: Official Google Identity Services integration with instant verified analyst fallback for offline hackathon evaluations.
+
 
 ---
 

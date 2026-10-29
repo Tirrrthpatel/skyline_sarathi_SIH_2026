@@ -122,6 +122,11 @@ export function Navbar({ currentView, onNavigate, user, onOpenAuth }: NavbarProp
               <>
                 <span className="w-2 h-2 bg-[#f3d400] inline-block border border-black"></span>
                 <span className="max-w-[100px] truncate">{user.name.split(" ")[0]}</span>
+                {user.provider === "neon" && (
+                  <span className="hidden sm:inline-block px-1 py-0.2 bg-[#f3d400] text-black text-[9px] font-mono font-black border border-black">
+                    NEON
+                  </span>
+                )}
               </>
             ) : (
               <>

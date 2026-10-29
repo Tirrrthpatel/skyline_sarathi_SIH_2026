@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import type { Airport } from "@/types/aviation"
 import { useTheme } from "@/components/theme-provider"
-import { Layers, Maximize2, Minimize2, Navigation, Compass, Globe, Plane, Radio } from "lucide-react"
+import { Layers, Maximize2, Minimize2, Compass, Globe, Plane, Radio } from "lucide-react"
 
 interface RouteMapProps {
   originAirport: Airport
@@ -10,7 +10,7 @@ interface RouteMapProps {
   bearing: number
 }
 
-type MapStyle = "default" | "satellite" | "osm"
+type MapStyle = "satellite" | "osm"
 
 // Spherical Great Circle Geodesic point interpolation
 function getGreatCirclePoints(
@@ -61,7 +61,7 @@ export function RouteMap({
 }: RouteMapProps) {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
-  const [mapStyle, setMapStyle] = useState<MapStyle>("default")
+  const [mapStyle, setMapStyle] = useState<MapStyle>("satellite")
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [leafletLoaded, setLeafletLoaded] = useState(false)
 
@@ -78,30 +78,23 @@ export function RouteMap({
   const eteFormatted = `${hours}h ${mins}m`
 
   // Base Tile URLs provided by user specifications
-  const getTileUrl = (style: MapStyle, dark: boolean) => {
+  const getTileUrl = (style: MapStyle) => {
     switch (style) {
-      case "satellite":
-        return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
       case "osm":
         return "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      case "default":
+      case "satellite":
       default:
-        // Aviation Vector CartoDB: light in light mode, dark in dark mode
-        return dark
-          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     }
   }
 
   const getAttribution = (style: MapStyle) => {
     switch (style) {
-      case "satellite":
-        return "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS"
       case "osm":
         return "&copy; OpenStreetMap contributors"
-      case "default":
+      case "satellite":
       default:
-        return '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+        return "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS"
     }
   }
 
@@ -145,7 +138,7 @@ export function RouteMap({
       map.removeLayer(tileLayerRef.current)
     }
 
-    const tileUrl = getTileUrl(mapStyle, isDark)
+    const tileUrl = getTileUrl(mapStyle)
     const attribution = getAttribution(mapStyle)
 
     tileLayerRef.current = L.tileLayer(tileUrl, {
@@ -390,7 +383,7 @@ export function RouteMap({
             Corridor Trajectory & Airspace Map
           </h3>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono uppercase mt-0.5">
-            Orthodromic Geodesic Arc • Dynamic Aviation Vector & Esri Satellite Layers
+            Orthodromic Geodesic Arc • Esri Satellite & OpenStreetMap Layers
           </p>
         </div>
 
@@ -412,21 +405,9 @@ export function RouteMap({
         </div>
       </div>
 
-      {/* Map Style Selector Bar (Default Vector, Esri Satellite, OpenStreetMap) */}
+      {/* Map Style Selector Bar (Esri Satellite, OpenStreetMap) */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3 font-mono text-xs">
         <div className="flex items-center border-2 border-black dark:border-white divide-x-2 divide-black dark:divide-white">
-          <button
-            onClick={() => setMapStyle("default")}
-            className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${
-              mapStyle === "default"
-                ? "bg-[#f3d400] text-black font-black"
-                : "bg-white dark:bg-black text-black dark:text-white hover:bg-[#f3d400] hover:text-black"
-            }`}
-          >
-            <Navigation className="w-3.5 h-3.5" />
-            <span>DEFAULT (AVIATION)</span>
-          </button>
-
           <button
             onClick={() => setMapStyle("satellite")}
             className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${

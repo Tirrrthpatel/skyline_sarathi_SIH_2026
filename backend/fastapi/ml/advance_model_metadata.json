@@ -1,0 +1,31 @@
+{
+  "modelType": "HistGradientBoostingRegressor",
+  "algorithm": "Gradient Boosted Decision Trees (LightGBM-grade)",
+  "r2Score": 0.9302,
+  "r2Percent": 93.02,
+  "accuracyPercent": 93.02,
+  "maeInr": 3015.32,
+  "rmseInr": 5320.71,
+  "mapePercent": 15.26,
+  "within15PercentAccuracy": 63.14,
+  "trainingRecords": 74629,
+  "testRecords": 13170,
+  "totalRecords": 87799,
+  "featureCount": 13,
+  "features": [
+    "distance_km",
+    "lead_days",
+    "stop_counts",
+    "is_business",
+    "airline_code",
+    "origin_code",
+    "dest_code",
+    "departure_hour",
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "holiday_season",
+    "duration_minutes"
+  ],
+  "trainedAt": "2026-10-29T19:09:26.123526Z"
+}

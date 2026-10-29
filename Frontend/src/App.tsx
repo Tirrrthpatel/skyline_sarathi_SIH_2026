@@ -86,9 +86,26 @@ export function App() {
       else setView("landing")
     }
 
+    // Auto-load telemetry if navigating directly to dashboard
+    if (window.location.pathname === "/dashboard") {
+      predictFlightFare(searchParams).then((res) => {
+        setTelemetry(res)
+      }).catch((err) => {
+        setFareQueryError(err instanceof Error ? err.message : "Unable to load fares.")
+      })
+    }
+
     window.addEventListener("popstate", handlePopState)
     return () => window.removeEventListener("popstate", handlePopState)
   }, [])
+
+  const handleLaunchDashboard = () => {
+    if (!telemetry) {
+      handleSearch(searchParams)
+    } else {
+      navigateTo("dashboard")
+    }
+  }
 
   // Execute Flight Search & Telemetry Update
   const handleSearch = async (params: FlightSearchParams) => {
@@ -138,7 +155,7 @@ export function App() {
             {/* 1. Hero Section with Cursor-Parallax Flat Illustration */}
             <HeroSection
               onLaunchSearch={() => navigateTo("search")}
-              onOpenDashboard={() => navigateTo("dashboard")}
+              onOpenDashboard={handleLaunchDashboard}
             />
 
             {/* 2. SIH CPI Problem Statement Section */}
@@ -168,7 +185,7 @@ export function App() {
                 </p>
                 <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
                   <button
-                    onClick={() => navigateTo("dashboard")}
+                    onClick={handleLaunchDashboard}
                     className="bg-black dark:bg-white hover:bg-swiss-accent dark:hover:bg-swiss-accent text-white dark:text-black hover:text-white dark:hover:text-white font-black uppercase text-xs tracking-wider px-8 py-4 border-2 border-black dark:border-white rounded-none flex items-center justify-center gap-2 cursor-pointer transition-colors"
                   >
                     <span>Launch Live Dashboard</span>

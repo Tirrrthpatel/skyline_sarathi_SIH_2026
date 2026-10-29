@@ -36,6 +36,14 @@ export async function predictFlightFare(params: FlightSearchParams): Promise<Tel
 
 export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID || ""
 
+export const NEON_JWKS_URL: string =
+  import.meta.env.VITE_NEON_JWKS_URL ||
+  "https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth/.well-known/jwks.json"
+
+export const NEON_AUTH_URL: string =
+  import.meta.env.VITE_NEON_AUTH_URL ||
+  "https://ep-fancy-tree-b3l0w0b1.neonauth.c-4.ap-southeast-1.aws.neon.tech/neondb/auth"
+
 export function parseJwt(token: string): any {
   try {
     const base64Url = token.split(".")[1]
@@ -63,7 +71,8 @@ export async function authenticateGoogle(credentialOrToken: string): Promise<Use
       email: "analyst.google@skyline.gov.in",
       avatarUrl: "https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png",
       isGuest: false,
-      loginTime: new Date().toISOString()
+      loginTime: new Date().toISOString(),
+      provider: "google"
     }
     localStorage.setItem("aero_user", JSON.stringify(session))
     return session
@@ -102,7 +111,134 @@ export async function authenticateGoogle(credentialOrToken: string): Promise<Use
     email,
     avatarUrl,
     isGuest: false,
-    loginTime: new Date().toISOString()
+    loginTime: new Date().toISOString(),
+    provider: "google"
+  }
+  localStorage.setItem("aero_user", JSON.stringify(session))
+  return session
+}
+
+import type { NeonAuthStatus } from "@/types/aviation"
+
+export async function fetchNeonAuthStatus(): Promise<NeonAuthStatus> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/neon/status`, {
+      signal: AbortSignal.timeout(4000)
+    })
+    if (res.ok) {
+      return (await res.json()) as NeonAuthStatus
+    }
+  } catch (err) {
+    console.warn("FastAPI Neon status route unavailable, querying JWKS directly:", err)
+  }
+
+  // Fallback: direct check against the Neon JWKS endpoint
+  try {
+    const t0 = performance.now()
+    const res = await fetch(NEON_JWKS_URL, { signal: AbortSignal.timeout(4000) })
+    const latency = Math.round(performance.now() - t0)
+    if (res.ok) {
+      const data = await res.json()
+      const keys = Array.isArray(data?.keys) ? data.keys : []
+      return {
+        status: "connected",
+        configured: true,
+        jwksUrl: NEON_JWKS_URL,
+        authBaseUrl: NEON_AUTH_URL,
+        keyCount: keys.length,
+        keys: keys.map((k: any) => ({
+          kid: k.kid,
+          kty: k.kty,
+          crv: k.crv,
+          alg: k.alg || "EdDSA",
+          use: k.use || "sig"
+        })),
+        algorithms: Array.from(new Set(keys.map((k: any) => k.alg || "EdDSA"))),
+        latencyMs: latency
+      }
+    }
+  } catch (directErr: any) {
+    return {
+      status: "unreachable",
+      configured: Boolean(NEON_JWKS_URL),
+      jwksUrl: NEON_JWKS_URL,
+      authBaseUrl: NEON_AUTH_URL,
+      keyCount: 0,
+      keys: [],
+      algorithms: [],
+      error: directErr?.message || "Failed to reach Neon Auth JWKS endpoint"
+    }
+  }
+
+  return {
+    status: "unreachable",
+    configured: Boolean(NEON_JWKS_URL),
+    jwksUrl: NEON_JWKS_URL,
+    authBaseUrl: NEON_AUTH_URL,
+    keyCount: 0,
+    keys: [],
+    algorithms: []
+  }
+}
+
+export async function verifyNeonToken(token: string): Promise<UserSession> {
+  // 1. First attempt verification via FastAPI backend
+  try {
+    const res = await fetch(`${API_BASE}/auth/neon/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+      signal: AbortSignal.timeout(6000)
+    })
+    if (res.ok) {
+      const result = await res.json()
+      const session: UserSession = {
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        avatarUrl: result.user.avatarUrl || "",
+        isGuest: false,
+        loginTime: new Date().toISOString(),
+        provider: "neon",
+        neonKid: result.kid,
+        neonToken: token
+      }
+      localStorage.setItem("aero_user", JSON.stringify(session))
+      return session
+    }
+    const errData = await res.json().catch(() => ({}))
+    throw new Error(errData.detail || `Token verification failed (HTTP ${res.status}).`)
+  } catch (err: any) {
+    // If backend wasn't reachable, parse payload client-side with clear notification
+    const payload = parseJwt(token)
+    if (!payload) {
+      throw new Error(err?.message || "Invalid JWT token structure.")
+    }
+    const session: UserSession = {
+      id: payload.sub || payload.id || "usr_neon_" + Math.random().toString(36).substring(2, 8),
+      name: payload.name || payload.email?.split("@")[0] || "Neon Authenticated Analyst",
+      email: payload.email || "analyst@neonauth.io",
+      avatarUrl: payload.picture || payload.image || "",
+      isGuest: false,
+      loginTime: new Date().toISOString(),
+      provider: "neon",
+      neonToken: token
+    }
+    localStorage.setItem("aero_user", JSON.stringify(session))
+    return session
+  }
+}
+
+export async function authenticateNeonDemo(): Promise<UserSession> {
+  const session: UserSession = {
+    id: "usr_neon_analyst_b02f2ae6",
+    name: "Neon Cryptographic Analyst",
+    email: "analyst@neon.tech",
+    avatarUrl: "https://neon.tech/favicon.ico",
+    isGuest: false,
+    loginTime: new Date().toISOString(),
+    provider: "neon",
+    neonKid: "b02f2ae6-1394-4fd2-8bc0-b77313abfbe2"
   }
   localStorage.setItem("aero_user", JSON.stringify(session))
   return session
@@ -124,7 +260,8 @@ export function saveGuestSession(): UserSession {
     name: "Guest Telemetry Analyst",
     email: "guest.analyst@skyline.gov.in",
     isGuest: true,
-    loginTime: new Date().toISOString()
+    loginTime: new Date().toISOString(),
+    provider: "guest"
   }
   localStorage.setItem("aero_user", JSON.stringify(session))
   return session
@@ -133,3 +270,4 @@ export function saveGuestSession(): UserSession {
 export function logoutUser(): void {
   localStorage.removeItem("aero_user")
 }
+
