@@ -118,6 +118,51 @@ export async function authenticateGoogle(credentialOrToken: string): Promise<Use
   return session
 }
 
+export function authenticateManual(params: {
+  fullName?: string
+  email: string
+  password?: string
+  mode: 'signin' | 'signup'
+}): UserSession {
+  const email = params.email.trim().toLowerCase()
+  let name = params.fullName?.trim() || email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Analyst'
+
+  const storedUsersRaw = localStorage.getItem('aero_registered_users')
+  let registeredUsers: Array<{ email: string; name: string; password?: string }> = []
+  try {
+    if (storedUsersRaw) registeredUsers = JSON.parse(storedUsersRaw)
+  } catch {
+    registeredUsers = []
+  }
+
+  if (params.mode === 'signup') {
+    const existingIndex = registeredUsers.findIndex(u => u.email === email)
+    if (existingIndex >= 0) {
+      registeredUsers[existingIndex] = { email, name, password: params.password }
+    } else {
+      registeredUsers.push({ email, name, password: params.password })
+    }
+    localStorage.setItem('aero_registered_users', JSON.stringify(registeredUsers))
+  } else {
+    const existing = registeredUsers.find(u => u.email === email)
+    if (existing && existing.name) {
+      name = existing.name
+    }
+  }
+
+  const session: UserSession = {
+    id: 'usr_' + Math.random().toString(36).substring(2, 9),
+    name,
+    email,
+    avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=000000&textColor=f3d400`,
+    isGuest: false,
+    loginTime: new Date().toISOString(),
+    provider: 'manual'
+  }
+  localStorage.setItem('aero_user', JSON.stringify(session))
+  return session
+}
+
 import type { NeonAuthStatus } from "@/types/aviation"
 
 export async function fetchNeonAuthStatus(): Promise<NeonAuthStatus> {

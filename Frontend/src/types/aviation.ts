@@ -102,7 +102,7 @@ export interface UserSession {
   avatarUrl?: string;
   isGuest: boolean;
   loginTime: string;
-  provider?: 'google' | 'neon' | 'guest';
+  provider?: 'google' | 'manual' | 'neon' | 'guest';
   neonKid?: string;
   neonToken?: string;
 }
