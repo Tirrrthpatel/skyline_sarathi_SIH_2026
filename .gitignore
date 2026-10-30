@@ -71,6 +71,7 @@ Thumbs.db
 !.vscode/extensions.json
 .agents/
 skills-lock.json
+scratch/
 *.suo
 *.ntvs*
 *.njsproj

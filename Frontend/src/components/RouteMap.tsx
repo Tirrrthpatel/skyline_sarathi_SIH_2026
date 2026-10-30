@@ -32,7 +32,7 @@ function getGreatCirclePoints(
     Math.asin(
       Math.sqrt(
         Math.pow(Math.sin((rLat1 - rLat2) / 2), 2) +
-          Math.cos(rLat1) * Math.cos(rLat2) * Math.pow(Math.sin((rLon1 - rLon2) / 2), 2)
+        Math.cos(rLat1) * Math.cos(rLat2) * Math.pow(Math.sin((rLon1 - rLon2) / 2), 2)
       )
     )
 
@@ -362,9 +362,8 @@ export function RouteMap({
 
   return (
     <div
-      className={`p-6 sm:p-8 rounded-none bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white text-left transition-colors duration-150 ${
-        isFullscreen ? "fixed inset-4 z-50 overflow-auto flex flex-col" : ""
-      }`}
+      className={`p-6 sm:p-8 rounded-none bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white text-left transition-colors duration-150 ${isFullscreen ? "fixed inset-4 z-50 overflow-auto flex flex-col" : ""
+        }`}
     >
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b-2 border-black dark:border-white">
@@ -410,11 +409,10 @@ export function RouteMap({
         <div className="flex items-center border-2 border-black dark:border-white divide-x-2 divide-black dark:divide-white">
           <button
             onClick={() => setMapStyle("satellite")}
-            className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${
-              mapStyle === "satellite"
+            className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${mapStyle === "satellite"
                 ? "bg-[#f3d400] text-black font-black"
                 : "bg-white dark:bg-black text-black dark:text-white hover:bg-[#f3d400] hover:text-black"
-            }`}
+              }`}
           >
             <Globe className="w-3.5 h-3.5 text-black dark:text-white" />
             <span>SATELLITE (ESRI)</span>
@@ -422,11 +420,10 @@ export function RouteMap({
 
           <button
             onClick={() => setMapStyle("osm")}
-            className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${
-              mapStyle === "osm"
+            className={`px-3 py-1.5 font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 ${mapStyle === "osm"
                 ? "bg-[#f3d400] text-black font-black"
                 : "bg-white dark:bg-black text-black dark:text-white hover:bg-[#f3d400] hover:text-black"
-            }`}
+              }`}
           >
             <Layers className="w-3.5 h-3.5" />
             <span>OPENSTREETMAP</span>
@@ -444,9 +441,8 @@ export function RouteMap({
 
       {/* Interactive Leaflet Map Container */}
       <div
-        className={`relative w-full border-2 border-black dark:border-white bg-neutral-100 dark:bg-neutral-950 overflow-hidden ${
-          isFullscreen ? "flex-1 min-h-[400px]" : "aspect-[5/4] sm:aspect-[16/10]"
-        }`}
+        className={`relative w-full border-2 border-black dark:border-white bg-neutral-100 dark:bg-neutral-950 overflow-hidden ${isFullscreen ? "flex-1 min-h-[400px]" : "aspect-[5/4] sm:aspect-[16/10]"
+          }`}
       >
         <div ref={mapContainerRef} className="w-full h-full z-10" />
 

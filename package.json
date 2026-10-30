@@ -5,5 +5,11 @@
     "dev": "npm --prefix Frontend run dev",
     "build": "npm --prefix Frontend install && npm --prefix Frontend run build",
     "preview": "npm --prefix Frontend run preview"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6"
   }
 }

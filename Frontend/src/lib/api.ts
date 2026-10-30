@@ -1,7 +1,22 @@
 import type { FlightSearchParams, TelemetryPredictionResult, Airport, UserSession } from "@/types/aviation"
 import { INDIAN_AIRPORTS } from "./aviationData"
 
-const API_BASE = import.meta.env.VITE_FASTAPI_BASE || "http://localhost:8000/api"
+function getApiBase(): string {
+  if (import.meta.env.VITE_FASTAPI_BASE) {
+    return import.meta.env.VITE_FASTAPI_BASE.replace(/\/+$/, "")
+  }
+  // In production (e.g. hosted on Vercel), use relative /api
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname
+    if (host !== "localhost" && host !== "127.0.0.1") {
+      return "/api"
+    }
+  }
+  // In local development, default to local FastAPI backend
+  return "http://localhost:8000/api"
+}
+
+const API_BASE = getApiBase()
 
 export async function fetchAirports(): Promise<Airport[]> {
   try {
